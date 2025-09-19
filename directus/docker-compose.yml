@@ -1,0 +1,94 @@
+version: "3"
+services:
+  database:
+    container_name: ${APP_NAME}_directus_${APP_ENV}
+    image: postgres:17
+    volumes:
+      - ./data/database:/var/lib/postgresql/data
+    env_file: .env
+    ports:
+      - "${POSTGRES_EXPOSE_PORT}:5432"
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: "password"
+      POSTGRES_HOST: "0.0.0.0/0"
+    restart: always
+    healthcheck:
+      test: ["CMD", "pg_isready", "--host=localhost", "--username=${DB_DATABASE}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_interval: 5s
+      start_period: 30s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "5"
+
+  cache:
+    image: redis:6
+    container_name: ${APP_NAME}_redis_${APP_ENV}
+    command: /bin/sh -c "redis-server --requirepass $${REDIS_HOST_PASSWORD}"
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "5"
+
+  directus:
+    container_name: ${APP_NAME}_directus_${APP_ENV}
+    image: directus/directus:11.10.0
+    ports:
+      - "${DIRECTUS_PORT}:8055"
+    volumes:
+      - ./uploads:/directus/uploads
+      - ./extensions:/directus/extensions
+      - ./migrations:/directus/migrations
+    restart: always
+    depends_on:
+      database:
+        condition: service_healthy
+      cache:
+        condition: service_healthy
+    env_file: .env
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "5"
+    environment:
+      ACCESS_TOKEN_TTL: "1d"
+      REFRESH_TOKEN_TTL: "7d"
+      REFRESH_TOKEN_COOKIE_SECURE: "false"
+      REFRESH_TOKEN_COOKIE_SAME_SITE: "lax"
+      CORS_ENABLED: "true"
+      CORS_ORIGIN: "true"
+      CORS_METHODS: "GET,POST,PATCH,DELETE"
+      CORS_ALLOWED_HEADERS: "Content-Type,Authorization"
+      CORS_EXPOSED_HEADERS: "Content-Range"
+      CORS_CREDENTIALS: "true"
+      CORS_MAX_AGE: "18000"
+      WEBSOCKETS_LOGS_ENABLED: true
+      PM2_INSTANCES: "1"      
+      HOST: "0.0.0.0"
+      MAX_PAYLOAD_SIZE: "128mb"
+      SERVE_APP: "true"
+      GRAPHQL_INTROSPECTION: "true"
+      RATE_LIMITER_ENABLED: "false"
+      STORAGE_LOCATIONS: "local"
+      STORAGE_LOCAL_DRIVER: "local"
+      STORAGE_LOCAL_ROOT: "./uploads"
+      EXTENSIONS_PATH: "./extensions"
+      MIGRATIONS_PATH: "./migrations"
+      EXTENSIONS_AUTO_RELOAD: "true"
+      DB_CLIENT: pg
+      TELEMETRY: "false"
+    user: root
+
