@@ -1,26 +1,26 @@
 # General Configuration
-APP_NAME="DEMO"
+APP_NAME="directus-demo"
 APP_ENV=staging
 DIRECTUS_PORT=8055
 APP_DEBUG=false
 
 PUBLIC_URL= "https://domain.com"
 PUBLIC_HOST= "domain.com"
-COMPOSE_PROJECT_NAME="$APP_NAME_directus_$APP_ENV" # for docker composer, we need this env
+COMPOSE_PROJECT_NAME="${APP_NAME}_directus_${APP_ENV}" # for docker composer, we need this env
 
 # Database configuration for postgres
 POSTGRES_PORT=5432
-POSTGRES_USER=PG_USER
-POSTGRES_PASSWORD=PG_PWD
-POSTGRES_DB=PG_DB
+POSTGRES_USER=directus_user
+POSTGRES_PASSWORD=directus_password123
+POSTGRES_DB=directus_db
 POSTGRES_EXPOSE_PORT=5437
 
 # Database Configuration for directus
 DB_HOST=database
-DB_PORT= ${POSTGRES_PORT}
-DB_USER= ${POSTGRES_USER}
-DB_PASSWORD= ${POSTGRES_PASSWORD}
-DB_DATABASE= ${POSTGRES_DB}
+DB_PORT=${POSTGRES_PORT}
+DB_USER=${POSTGRES_USER}
+DB_PASSWORD=${POSTGRES_PASSWORD}
+DB_DATABASE=${POSTGRES_DB}
 
 # Security
 SECRET="SOME_SECRET_KEY"
@@ -47,7 +47,7 @@ EMAIL_SMTP_PASSWORD=""
 
 # REDIS FOR DIRECTUS
 CACHE_STORE= "redis"
-REDIS_HOST_PASSWORD="REDIS PASSWORD"
+REDIS_HOST_PASSWORD="redispassword123"
 REDIS= "redis://cache:6379?password=$REDIS_HOST_PASSWORD"
 
 ADMIN_EMAIL= "admin@domain.com"

@@ -1,7 +1,6 @@
-version: "3"
 services:
   database:
-    container_name: ${APP_NAME}_directus_${APP_ENV}
+    container_name: ${APP_NAME}_db_${APP_ENV}
     image: postgres:17
     volumes:
       - ./data/database:/var/lib/postgresql/data
