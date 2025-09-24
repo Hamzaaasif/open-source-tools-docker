@@ -12,7 +12,7 @@ services:
       POSTGRES_HOST: "0.0.0.0/0"
     restart: always
     healthcheck:
-      test: ["CMD", "pg_isready", "--host=localhost", "--username=${DB_DATABASE}"]
+      test: ["CMD", "pg_isready", "--host=localhost", "--username=${DB_USER}", "--dbname=${DB_DATABASE}"]
       interval: 10s
       timeout: 5s
       retries: 5
